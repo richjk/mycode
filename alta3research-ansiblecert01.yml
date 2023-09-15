@@ -1,0 +1,66 @@
+---
+                                          # first cleanup with bash ~/px/scripts/full-setup.sh
+- name: Generate JMart Survey Results
+  hosts: planetexpress:!farnsworth:!zoidberg
+  connection: ssh
+  gather_facts: yes
+
+  vars:
+     surveycsv: ~/certcode/surveyresults.csv
+     shipping_reporter: bender
+     gas_reporter: fry
+
+  vars_prompt:
+     - name: "reporttype"
+       private: no
+       prompt: "What report would you like to generate? (shipping, gas, both) "
+
+  tasks:
+    - name: Check reporttype
+      debug:
+        msg: "{{ reporttype }}"
+
+          #    - name: Install figlet                # install figlet for report headers
+          #      ansible.builtin.apt:
+          #        name: figlet
+          #        state: present
+          #      become: yes                         # elevate to admin
+
+    - name: Distribute survey results     # send the csv survey results (gathered via other means) to the required hosts
+      ansible.builtin.copy:
+        src: "{{ surveycsv }}"            # source, on the controller
+        dest: ~/                          # destination, on the host
+        backup: yes                       # backup original dest file
+        force: yes                        # if dest exists, copy anyways if different
+
+    - name: Read survey results
+      read_csv:
+        path: "{{ surveycsv }}"
+        key: client
+      register: rawsurvey
+      debug:
+        msg: "{{ item.key }}:
+              {{ item.value.client }},
+              {{ item.value.service }},
+              {{ item.value.item }},
+              {{ item.value.rating }},
+              {{ item.value.comment }}"
+      loop: "{{ rawsurvey.list }}"
+:      loop_control:
+        loop_var: client
+
+    - name: Generate gas survey reports       # assigned hosts generate their report and return it
+      debug:
+        msg: "Gas Report"
+      when: (inventory_hostname == gas_reporter) and (reporttype == "gas" or reporttype == "both")
+
+    - name: Generate gas survey reports       # assigned hosts generate their report and return it
+      debug:
+        msg: "Shipping Report"
+      when: (inventory_hostname == shipping_reporter) and (reporttype == "shipping" or reporttype == "both")
+
+          #    - name: Display survey reports        # display the reports
+
+
+          #    - name: Get survey reports            # controller gets the survey reports from the hosts
+
