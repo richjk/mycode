@@ -1,0 +1,22 @@
+---
+survey_results:
+  client: "Leonard"
+    service: "shipping"
+    item: "pants"
+    rating: 5
+    comment: "I was great! I told Billy he could ship his pants too!"
+  client: "Sheldon"
+    service: "shipping"
+    item: "bed"
+    rating: 2
+    comment: "What's all the fuss? Anyone can ship their bed."
+  client: "Raj"
+    service: "gas"
+    item: "na"
+    rating: 4
+    comment: "I liked seeing the big gas truck there!"
+  client: "Howard"
+    service: "gas"
+    item: "na"
+    rating: 5
+    comment: "The big gas savings are awesome!"  
